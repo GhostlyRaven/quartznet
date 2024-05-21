@@ -1,5 +1,12 @@
 namespace Quartz;
 
+#if NET8_0_OR_GREATER
+/// <summary>
+/// References a method to be called as a handler for one of the IHostedLifecycleService methods.
+/// </summary>
+public delegate Task QuartzHostedServiceHandler(IServiceProvider provider, CancellationToken cancellationToken);
+#endif
+
 public class QuartzHostedServiceOptions
 {
     /// <summary>
@@ -23,4 +30,26 @@ public class QuartzHostedServiceOptions
     /// This avoids the running of jobs <em>during</em> application startup.
     /// </summary>
     public bool AwaitApplicationStarted { get; set; } = true;
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// The handler that is called before start Quartz hosted service.
+    /// </summary>
+    public QuartzHostedServiceHandler? HostedServiceStartingHandler { get; set; }
+
+    /// <summary>
+    /// The handler that is called after start Quartz hosted service.
+    /// </summary>
+    public QuartzHostedServiceHandler? HostedServiceStartedHandler { get; set; }
+
+    /// <summary>
+    /// TThe handler that is called before stop Quartz hosted service.
+    /// </summary>
+    public QuartzHostedServiceHandler? HostedServiceStoppingHandler { get; set; }
+
+    /// <summary>
+    /// The handler that is called after stop Quartz hosted service.
+    /// </summary>
+    public QuartzHostedServiceHandler? HostedServiceStoppedHandler { get; set; }
+#endif
 }
