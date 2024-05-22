@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Quartz.Impl.Matchers;
 using Quartz.Spi;
 
-#if NET6_OR_GREATER
+#if NET6_0_OR_GREATER
 using Lifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 #else
 using Lifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
@@ -337,6 +337,163 @@ public class QuartzHostedServiceTests
             throw new NotImplementedException();
         }
     }
+
+#if NET8_0_OR_GREATER
+    private sealed class MockQuartzHostedLifecycleService : IQuartzHostedLifecycleService
+    {
+        public Task StartingAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.CompletedTask;
+        }
+
+        public Task StartedAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.CompletedTask;
+        }
+
+        public Task StoppingAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.CompletedTask;
+        }
+
+        public Task StoppedAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.CompletedTask;
+        }
+    }
+
+    [Test]
+    public void StartingAsync_WithoutNullReferenceException()
+    {
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            null!);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StartingAsync(default));
+    }
+
+    [Test]
+    public void StartedAsync_WithoutNullReferenceException()
+    {
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            null!);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StartedAsync(default));
+    }
+
+    [Test]
+    public void StoppingAsync_WithoutNullReferenceException()
+    {
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            null!);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StoppingAsync(default));
+    }
+
+    [Test]
+    public void StoppedAsync_WithoutNullReferenceException()
+    {
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            null!);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StoppedAsync(default));
+    }
+
+    [Test]
+    public void StartingAsync_WithoutOperationCanceledException()
+    {
+        var hostedLifecycleService = new MockQuartzHostedLifecycleService();
+        var cancellationToken = new CancellationToken(true);
+
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            hostedLifecycleService);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StartingAsync(cancellationToken));
+    }
+
+    [Test]
+    public void StartedAsync_WithoutOperationCanceledException()
+    {
+        var hostedLifecycleService = new MockQuartzHostedLifecycleService();
+        var cancellationToken = new CancellationToken(true);
+
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            hostedLifecycleService);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StartedAsync(cancellationToken));
+    }
+
+    [Test]
+    public void StoppingAsync_WithoutOperationCanceledException()
+    {
+        var hostedLifecycleService = new MockQuartzHostedLifecycleService();
+        var cancellationToken = new CancellationToken(true);
+
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            hostedLifecycleService);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StoppingAsync(cancellationToken));
+    }
+
+    [Test]
+    public void StoppedAsync_WithoutOperationCanceledException()
+    {
+        var hostedLifecycleService = new MockQuartzHostedLifecycleService();
+        var cancellationToken = new CancellationToken(true);
+
+        var appliationLifetime = new MockApplicationLifetime();
+        var schedulerFactory = new MockSchedulerFactory();
+        var quartzHostedService = new QuartzHostedService(
+            appliationLifetime,
+            schedulerFactory,
+            Options.Create(new QuartzHostedServiceOptions()),
+            hostedLifecycleService);
+
+        Assert.DoesNotThrowAsync(async () => await quartzHostedService.StoppedAsync(cancellationToken));
+    }
+#endif
 
     [Test]
     [TestCase(false, false, true)]
